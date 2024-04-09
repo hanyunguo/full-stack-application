@@ -1,6 +1,7 @@
 package com.project.ecommerce.filters;
 
 import com.project.ecommerce.enums.UserRole;
+import com.project.ecommerce.services.jwt.UserDatailsServiceImpl;
 import com.project.ecommerce.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,14 +35,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             username = jwtUtil.extractUsername(token);
         }
 
+        // checking whether there is a valid username extracted from the JWT token AND This condition checks whether there is no existing authentication context in the 'SecurityContextHolder'
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userDatailsService.loadUserByUsername(username);
 
-            //validate user detail
+            //validate token
             if(jwtUtil.validateToken(token, userDetails)){
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                //update security context holder with latest authtoken
+                //t
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
